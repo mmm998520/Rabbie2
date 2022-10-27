@@ -14,7 +14,7 @@ namespace TarodevController {
 
 #if (ENABLE_INPUT_SYSTEM)
         private PlayerInputActions _actions;
-        private InputAction _move, _jump, _dash, _attack, _fly;
+        private InputAction _move, _jump, _dash, _attack, _fly, _interactive;
 
         private void Awake() {
             _actions = new PlayerInputActions();
@@ -23,6 +23,7 @@ namespace TarodevController {
             _dash = _actions.Player.Dash;
             _attack = _actions.Player.Attack;
             _fly = _actions.Player.Fly;
+            _interactive = _actions.Player.Interactive;
         }
 
         private void OnEnable() {
@@ -42,6 +43,7 @@ namespace TarodevController {
                 FlyDown = _fly.triggered && _fly.ReadValue<float>() > 0,
                 FlyHeld = !_fly.triggered && _fly.ReadValue<float>() > 0,
                 FlyUp = _fly.triggered && _fly.ReadValue<float>() == 0,
+                InteractiveDown = _interactive.triggered && _interactive.ReadValue<float>() > 0,
                 Move = _move.ReadValue<Vector2>()
             };
         }
@@ -68,5 +70,6 @@ namespace TarodevController {
         public bool FlyDown;
         public bool FlyHeld;
         public bool FlyUp;
+        public bool InteractiveDown;
     }
 }

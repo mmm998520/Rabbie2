@@ -7,6 +7,8 @@ using UnityEngine;
 namespace TarodevController {
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : MonoBehaviour, IPlayerController {
+        [SerializeField] SpriteRenderer spriteRenderer;
+
         [SerializeField] public static LayerMask playerLayer;
 
         [SerializeField] private ScriptableStats _stats;
@@ -15,7 +17,7 @@ namespace TarodevController {
         private Rigidbody2D _rb;
         private CapsuleCollider2D[] _cols; // Standing and crouching colliders
         private CapsuleCollider2D _col; // Current collider
-        private PlayerInput _input;
+        public static PlayerInput _input;
 
         private Vector2 _speed;
         private bool _jumpToConsume;
@@ -59,7 +61,7 @@ namespace TarodevController {
         private float _currentWallJumpMoveMultiplier;
         private int _wallDir;
         private int _ladderHitCount;
-        public static int canFlyFrames;
+        public static int _canFlyFrames;
         public bool isFlying;
 
         #region External
@@ -92,7 +94,8 @@ namespace TarodevController {
 
             _rb = GetComponent<Rigidbody2D>();
             _cols = GetComponents<CapsuleCollider2D>();
-            _input = GetComponent<PlayerInput>();
+            _input = FindObjectOfType<PlayerInput>();
+
 
             // Colliders cannot be check whilst disabled. Let's cache it instead
             _standingColliderBounds = _cols[0].bounds;
@@ -118,12 +121,21 @@ namespace TarodevController {
         }
 
         protected virtual void FixedUpdate() {
+            if(_frameInput.Move.x < 0)
+            {
+                spriteRenderer.flipX = true;
+            }
+            else if (_frameInput.Move.x > 0)
+            {
+                spriteRenderer.flipX = false;
+            }
+
             _fixedFrame++;
             _currentExternalVelocity = Vector2.MoveTowards(_currentExternalVelocity, Vector2.zero, _stats.ExternalVelocityDecay * Time.fixedDeltaTime);
 
             CheckCollisions();
-
-            if(canFlyFrames > 3 && (_frameInput.FlyDown || _frameInput.FlyHeld))
+            print(dashState);
+            if(_canFlyFrames > _stats.canFlyFrames && (_frameInput.FlyDown || _frameInput.FlyHeld))
             {
                 HandleAttacking();
                 HandleFlyHorizontal();
@@ -429,7 +441,7 @@ namespace TarodevController {
 
             // Early end detection
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
-            if (dashState == DashState.sliding)
+            if (_input.FrameInput.JumpHeld && dashState == DashState.sliding)
             {
                 _endedJumpEarly = true;
             }
@@ -473,7 +485,7 @@ namespace TarodevController {
                     //DashingChanged?.Invoke(false, Vector2.zero);
                 }
             }
-            else if (dashState == DashState.sliding && _stats.DashSlidingFrames != 0)
+            else if (dashState == DashState.sliding && _stats.DashSlidingFrames > 0)
             {
                 _speed.x = _dashVel.x * _stats.DashSlidingRate + _speed.x * (1 - _stats.DashSlidingRate);
                 _speed.y = _dashVel.y * _stats.DashSlidingRate + _speed.y * (1 - _stats.DashSlidingRate);
@@ -484,11 +496,37 @@ namespace TarodevController {
                 }
             }
 
-            if (_fixedFrame - _startedDashing > _stats.DashCDFrames)
+            if (true)
             {
-                _canDash = true;
+                //觸地或飛行Dash重製
+                bool canfly = false;
+                if(_canFlyFrames > _stats.canFlyFrames && (_frameInput.FlyDown || _frameInput.FlyHeld))
+                {
+                    canfly = true;
+                }
+                if ((_grounded || canfly) && _fixedFrame - _startedDashing > _stats.DashCDFrames)
+                {
+                    _canDash = true;
+                }
+            }
+            if (false)
+            {
+                //觸地Dash重製
+                if (_grounded && _fixedFrame - _startedDashing > _stats.DashCDFrames)
+                {
+                    _canDash = true;
+                }
+            }
+            if (false)
+            {
+                //CD Dash重製
+                if (_fixedFrame - _startedDashing > _stats.DashCDFrames)
+                {
+                    _canDash = true;
+                }
             }
             _dashToConsume = false;
+
 
             #region 原作者的Dash
             if (false)
@@ -537,7 +575,6 @@ namespace TarodevController {
 
         protected virtual void HandleFall() {
             if (dashState == DashState.dashing) return;
-
             if (_onLadder) {
                 var multiplier = _frameInput.Move.y < 0 ? _stats.LadderSlideMultiplier : 1;
                 _speed.y = _frameInput.Move.y * _stats.LadderClimbSpeed * multiplier;

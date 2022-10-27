@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlyAreaController : Receiver
+public class FlyAreaController : MonoBehaviour
 {
     [SerializeField] LayerMask flyAreaLayer;
     bool trigger;
@@ -16,7 +16,7 @@ public class FlyAreaController : Receiver
     {
         if ((1 << collision.gameObject.layer) == flyAreaLayer)
         {
-            TarodevController.PlayerController.canFlyFrames++;
+            TarodevController.PlayerController._canFlyFrames++;
             trigger = true;
         }
     }
@@ -28,7 +28,7 @@ public class FlyAreaController : Receiver
         yield return waitForFixedUpdate;
         if (!trigger)
         {
-            TarodevController.PlayerController.canFlyFrames = 0;
+            TarodevController.PlayerController._canFlyFrames = 0;
         }
         trigger = false;
     }

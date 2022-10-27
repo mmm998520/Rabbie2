@@ -22,6 +22,9 @@ namespace TarodevController {
         public bool AllowCreeping;
 
         [Header("FlyMovement")]
+        [Tooltip("進入飛行所需幀數")]
+        public float canFlyFrames = 3;
+
         [Tooltip("The players capacity to gain speed")]
         public float FlyAcceleration = 120;
 

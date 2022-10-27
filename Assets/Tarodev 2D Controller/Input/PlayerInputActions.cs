@@ -59,6 +59,14 @@ namespace TarodevController
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Interactive"",
+                    ""type"": ""Button"",
+                    ""id"": ""020dc46e-1af1-45b7-89bb-26d9c7fcfd2f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -259,6 +267,28 @@ namespace TarodevController
                     ""action"": ""Fly"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ed2752ca-bb62-4c52-895b-fd988b46a273"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interactive"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d02d89fb-be4b-4b9a-9063-3c1c0358b1a9"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Interactive"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -333,6 +363,7 @@ namespace TarodevController
             m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
             m_Player_Fly = m_Player.FindAction("Fly", throwIfNotFound: true);
             m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
+            m_Player_Interactive = m_Player.FindAction("Interactive", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -387,6 +418,7 @@ namespace TarodevController
         private readonly InputAction m_Player_Dash;
         private readonly InputAction m_Player_Fly;
         private readonly InputAction m_Player_Attack;
+        private readonly InputAction m_Player_Interactive;
         public struct PlayerActions
         {
             private @PlayerInputActions m_Wrapper;
@@ -396,6 +428,7 @@ namespace TarodevController
             public InputAction @Dash => m_Wrapper.m_Player_Dash;
             public InputAction @Fly => m_Wrapper.m_Player_Fly;
             public InputAction @Attack => m_Wrapper.m_Player_Attack;
+            public InputAction @Interactive => m_Wrapper.m_Player_Interactive;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -420,6 +453,9 @@ namespace TarodevController
                     @Attack.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttack;
                     @Attack.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttack;
                     @Attack.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttack;
+                    @Interactive.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteractive;
+                    @Interactive.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteractive;
+                    @Interactive.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteractive;
                 }
                 m_Wrapper.m_PlayerActionsCallbackInterface = instance;
                 if (instance != null)
@@ -439,6 +475,9 @@ namespace TarodevController
                     @Attack.started += instance.OnAttack;
                     @Attack.performed += instance.OnAttack;
                     @Attack.canceled += instance.OnAttack;
+                    @Interactive.started += instance.OnInteractive;
+                    @Interactive.performed += instance.OnInteractive;
+                    @Interactive.canceled += instance.OnInteractive;
                 }
             }
         }
@@ -495,6 +534,7 @@ namespace TarodevController
             void OnDash(InputAction.CallbackContext context);
             void OnFly(InputAction.CallbackContext context);
             void OnAttack(InputAction.CallbackContext context);
+            void OnInteractive(InputAction.CallbackContext context);
         }
     }
 }
