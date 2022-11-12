@@ -441,6 +441,10 @@ namespace TarodevController {
 
             // Early end detection
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
+            if (_input != null)
+            {
+                print("a");
+            }
             if (_input.FrameInput.JumpHeld && dashState == DashState.sliding)
             {
                 _endedJumpEarly = true;

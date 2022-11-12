@@ -194,7 +194,7 @@ namespace TarodevController
                 {
                     ""name"": """",
                     ""id"": ""9f0d43e5-99cf-4f28-b11f-0407291c8b8c"",
-                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
